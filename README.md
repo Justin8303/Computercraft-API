@@ -26,7 +26,7 @@
 |convert|getSpecificItem|1) alle Items von getItems 2) die ItemID, des gewünschten Items|Gibt das Item zurück.
 |convert|getEnchantments|1) item, welches bei getSpecificItem zurückgegeben wird|Gibt alle enchantments in einer Table zurück.|
 
-#### Item
+#### Aufbau des Items
 
 - item
   - .id ist die Minecraft ID des Items
