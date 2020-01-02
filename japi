@@ -1,0 +1,176 @@
+sides = {
+    "front",
+    "bottom",
+    "left",
+    "right",
+    "top",
+    "back"
+}
+
+enchatmentIDs = {
+    [0] = "protection",
+    [1] = "fire protection",
+    [2] = "feather falling",
+    [3] = "blast protection",
+    [4] = "projectile protection",
+    [5] = "respiration",
+    [6] = "aqua affinity",
+    [7] = "thorns",
+
+    [16] = "sharpness",
+    [17] = "smite",
+    [18] = "bane of arthropods",
+    [19] = "knockback",
+    [20] = "fire aspect",
+    [21] = "looting",
+
+    [32] = "efficiency",
+    [33] = "silk touch",
+    [34] = "unbreaking",
+    [35] = "fortune",
+
+    [48] = "power",
+    [49] = "punch",
+    [50] = "flame",
+    [51] = "infinity",
+    
+    [79] = "disjunction",
+    [80] = "vorpal"
+}
+
+modules = {
+    ["logisticPipes"] = {
+        ["localVars"] = { requestSide = "", pipe = nil },
+        ["request"] = {
+
+            ["setRequestSide"] = function(requestSide)
+                if checkSide(requestSide) then
+                    modules.logisticPipes.localVars.requestSide = requestSide
+                    return true
+                else
+                    return false
+                end
+            end,
+
+            ["getRequestSide"] = function()
+                return modules.logisticPipes.localVars.requestSide
+            end,
+            
+            ["initPipe"] = function()
+                modules.logisticPipes.localVars.pipe = peripheral.wrap(modules.logisticPipes.localVars.requestSide)
+            end,
+
+            ["getItems"] = function(get_nbt, get_damage, get_iid)
+                local pipe = modules.logisticPipes.localVars.pipe
+                
+                pipe.getAvailableItems()
+                
+                local event, items = os.pullEvent("available_items_return")
+                local converted_items = {}
+                if get_nbt == nil then get_nbt = false end
+
+                for k,v in pairs(items) do
+                    itemObject = {
+                        ["id"] = pipe.getItemID(v[1]),
+                        ["amout"] = v[2]
+                    }
+
+                    if get_nbt then
+                        nbt = convertNBT(pipe.getNBTTagCompound(v[1]))
+                        if nbt then itemObject["nbt"] = nbt end
+                    end
+
+                    if get_damage then
+                        damage = pipe.getItemDamage(v[1])
+                        if damage then itemObject["damage"] = damage end
+                    end
+
+                    if get_iid then
+                        itemObject["iid"] = v[1]
+                    end
+
+                    table.insert( converted_items,  itemObject)
+                end
+
+                return converted_items
+            end
+        },
+
+        ["convert"] = {
+            ["getSpecificItem"] = function(items, id, multiple)
+                foundItems = {}
+
+                for k,v in pairs(items) do
+                    if v["id"] == id then
+                        table.insert(foundItems, v)
+                    end
+                end
+
+                if multiple then
+                    return foundItems
+                else
+                    return foundItems[1]
+                end
+            end,
+
+            ["getEnchantments"] = function(item)
+                senchantments = item["nbt"]["StoredEnchantments"] or item["nbt"]["ench"]
+                
+                if senchantments == nil then
+                    return {}
+                end
+
+                enchatments = {}
+
+                for k,v in pairs(senchantments) do
+                    if enchatmentIDs[v["id"]] then
+                        table.insert(enchatments, { ["Name"] = enchatmentIDs[v["id"]], ["Level"] = v["lvl"] })
+                    else
+                        table.insert(enchatments, { ["Name"] = v["id"], ["Level"] = v["lvl"] })
+                    end
+                end
+
+                return enchatments
+            end
+        }
+    }
+}
+
+function convertNBT(nbt)
+    local conv = {}
+    if (nbt == nil) then
+        return nil
+    elseif (nbt["type"] == "NBTTagCompound") or (nbt["type"] == "NBTTagList") then
+        for key, value in pairs(nbt["value"]) do
+            conv[key] = convertNBT(value)
+        end
+    else
+        conv = nbt["value"]
+    end
+    return conv
+end
+
+local function tablelength(T)
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
+end
+
+local function contains(value, table)
+    for k,v in pairs(table) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+function checkSide(side)
+    return contains(side, sides)
+end
+
+function getModule(modName)
+    if modules[modName] then
+        return modules[modName]
+    end
+end
