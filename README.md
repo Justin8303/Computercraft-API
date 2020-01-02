@@ -10,7 +10,7 @@
     ```os.loadAPI("japi")```
     
 2. Lade das Modul, was du haben möchtest, alle Module sind oben aufgelistet.
-    ```logisticPipesModule = japi.getModule("logisticPipes")```
+    ```module = getModule(MODUL)```
     
     
     
