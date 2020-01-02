@@ -7,10 +7,10 @@
 ## Laden der Module
 
 1. Importiere die API mit
-    os.loadAPI("japi")
+    ```os.loadAPI("japi")```
     
 2. Lade das Modul, was du haben möchtest, alle Module sind oben aufgelistet.
-    logisticPipesModule = japi.getModule("logisticPipes")
+    ```logisticPipesModule = japi.getModule("logisticPipes")```
     
     
     
@@ -26,7 +26,8 @@
 
 #### Item
 
-item.id ist die Minecraft ID des Items
-item.value ist die Menge der Items im System
-item.nbt sind die NBT Daten des Items. Diese werden aber nur gespeichert, wenn bei getItems das erste Argument auf true ist.
-item.damage ist der Damage Wert des Items. Dieser wird aber nur gespeichert, wenn bei getItems das zweite Argument auf true ist.
+- item
+  - .id ist die Minecraft ID des Items
+  - .value ist die Menge der Items im System
+  - .nbt sind die NBT Daten des Items. Diese werden aber nur gespeichert, wenn bei getItems das erste Argument auf true ist.
+  - .damage ist der Damage Wert des Items. Dieser wird aber nur gespeichert, wenn bei getItems das zweite Argument auf true ist.
