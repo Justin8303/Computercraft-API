@@ -133,6 +133,79 @@ modules = {
                 return enchatments
             end
         }
+    },
+
+    ["appliedEnergistics"] = {
+        ["localVars"] = { sensorSide = "", sensor = nil, acp = nil, apiLoaded = false },
+        ["localFuncs"] = {
+            ["getSens"] = function(x,y,z)
+                if not modules.appliedEnergistics.localVars.sensor then
+                    return false
+                end
+
+                for k,v in pairs(modules.appliedEnergistics.localVars.sensor.getTargets()) do
+                    if x and y and z then
+                        if v.Position.x == x and v.Position.y == y and v.Position.z == z and v.Name == "Me Wireless Access Point" then
+                            return k
+                        end
+                    elseif v.Name == "ME Wireless Access Point" then
+                        return k
+                    end
+                end
+            end
+        },
+        ["sensor"] = {
+            ["setSensorSide"] = function(sensorSide)
+                if checkSide(sensorSide) then
+                    modules.appliedEnergistics.localVars.sensorSide = sensorSide
+                    return true
+                else
+                    return false
+                end
+            end,
+
+            ["getSensorSide"] = function()
+                return modules.appliedEnergistics.localVars.sensorSide
+            end,
+            
+            ["initSensor"] = function(x,y,z)
+                if fs.exists("ocs/apis/sensor") then
+                    if not modules.appliedEnergistics.localVars.apiLoaded then
+                        os.loadAPI("ocs/apis/sensor")
+                        modules.appliedEnergistics.localVars.apiLoaded = true
+                    end
+
+                    modules.appliedEnergistics.localVars.sensor = sensor.wrap(modules.appliedEnergistics.localVars.sensorSide)
+                    modules.appliedEnergistics.localVars.acp = modules.appliedEnergistics.localFuncs.getSens(x,y,z)
+                    
+                    return true
+                else
+                    return false
+                end
+            end,
+
+            ["getItems"] = function()
+                return modules.appliedEnergistics.localVars.sensor.getTargetDetails(modules.appliedEnergistics.localVars.acp).Items
+            end
+        },
+
+        ["convert"] = {
+            ["getSpecificItem"] = function(items, name, multiple)
+                foundItems = {}
+
+                for k,v in pairs(items) do
+                    if v["Name"] == name then
+                        table.insert(foundItems, v)
+                    end
+                end
+
+                if multiple then
+                    return foundItems
+                else
+                    return foundItems[1]
+                end
+            end
+        }
     }
 }
 
